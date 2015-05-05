@@ -32,10 +32,18 @@ public class Geocoder {
 
     private final String clientId;
     private final Mac mac;
+    private final String apiKey;
+
+    public Geocoder(String apiKey) {
+        this.clientId = null;
+        this.mac = null;
+        this.apiKey = apiKey;
+    }
 
     public Geocoder() {
-        clientId = null;
-        mac = null;
+        this.clientId = null;
+        this.mac = null;
+        this.apiKey = null;
     }
 
     public Geocoder(final String clientId, final String clientKey) throws InvalidKeyException {
@@ -48,6 +56,7 @@ public class Geocoder {
 
         this.clientId = clientId;
         this.mac = getMAC(clientKey);
+        this.apiKey = null;
     }
 
 
@@ -82,6 +91,9 @@ public class Geocoder {
         if (mac == null) {
             // add server name to URL
             url.insert(0, GEOCODE_REQUEST_SERVER_HTTP);
+        } else if (apiKey != null) {
+            addApiKey(url);
+            url.insert(0, GEOCODE_REQUEST_SERVER_HTTPS);
         } else {
             addClientIdAndSignURL(url);
 
@@ -91,6 +103,10 @@ public class Geocoder {
 
         logger.trace("FULL Request URL: {}", url);
         return url.toString();
+    }
+
+    private void addApiKey(StringBuilder url) {
+        url.append("&key=").append(apiKey);
     }
 
     protected StringBuilder getURLQuery(GeocoderRequest geocoderRequest) throws UnsupportedEncodingException {
